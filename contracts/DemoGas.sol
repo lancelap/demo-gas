@@ -2,7 +2,12 @@
 pragma solidity ^0.8.28;
 
 contract DemoGas {
+    string public name;
     mapping(address => uint256) private balances;
+
+    constructor(string memory _name) {
+        name = _name;
+    }
 
     function deposit(address to, uint256 amount) external payable {
         require(msg.value == amount, "Value mismatch");
@@ -10,18 +15,7 @@ contract DemoGas {
 
         balances[to] = newBalance;
 
-        emit Deposited(to, amount, balances[to] + amount);
-    }
-
-    function sumArray(uint256[] calldata arr) external pure returns(uint256) {
-        uint256 total = 0;
-
-        for (uint256 i; i < arr.length; ) {
-            total += arr[i];
-            unchecked { ++i; }
-        }
-
-        return total;
+        emit Deposited(to, amount, balances[to]);
     }
 
     function withdraw(uint256 amount) external {        
@@ -33,6 +27,10 @@ contract DemoGas {
         require(ok, "Fail");
 
         emit Withdraw(msg.sender, amount);
+    }
+
+    function balanceOf(address account) view external returns(uint256) {
+        return balances[account];
     }
 
     event Deposited(address indexed user, uint256 amount, uint256 totalBalance);

@@ -2,8 +2,12 @@
 pragma solidity ^0.8.28;
 
 contract DemoGasOptimized {
+    string public name;
     mapping(address => uint256) private balances;
 
+    constructor(string memory _name) {
+        name = _name;
+    }
     /// @notice calldata дешевле memory для входящих данных
     function deposit(address to, uint256 amount) external payable {
         require(msg.value == amount, "Value mismatch");
@@ -19,22 +23,6 @@ contract DemoGasOptimized {
     }
     
 
-    /// @notice демо использования memory vs calldata
-    function sumArray(uint256[] calldata arr) external pure returns(uint256) {
-        // calldata -> memory (дорого, но иногда нужно в массивах/строках)
-        uint256[] memory copy = arr;
-
-        uint256 total = 0;
-        uint256 len = copy.length; // cache length in stack
-
-        for (uint256 i; i < len; ) {
-            total += copy[i];
-            unchecked { ++i; }
-        }
-
-        return total;
-    }
-
     /// @notice демо stack и storage оптимизации
     function withdraw(uint256 amount) external {
         uint256 balanceInMemory = balances[msg.sender]; // SLOAD only once
@@ -47,6 +35,10 @@ contract DemoGasOptimized {
         require(ok, "Fail");
 
         emit Withdraw(msg.sender, amount);
+    }
+
+    function balanceOf(address account) view external returns(uint256) {
+        return balances[account];
     }
 
     event Deposited(address indexed user, uint256 amount, uint256 totalBalance);
