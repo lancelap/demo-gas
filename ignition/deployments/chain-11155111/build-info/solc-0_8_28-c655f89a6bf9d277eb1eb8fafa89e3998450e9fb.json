@@ -1,0 +1,39 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_28-c655f89a6bf9d277eb1eb8fafa89e3998450e9fb",
+  "solcVersion": "0.8.28",
+  "solcLongVersion": "0.8.28+commit.7893614a",
+  "userSourceNameMap": {
+    "contracts/DemoGas.sol": "project/contracts/DemoGas.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "cancun",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/DemoGas.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.28;\n\ncontract DemoGas {\n    string public name;\n    mapping(address => uint256) private balances;\n\n    constructor(string memory _name) {\n        name = _name;\n    }\n\n    function deposit(address to, uint256 amount) external payable {\n        require(msg.value == amount, \"Value mismatch\");\n        uint256 newBalance = balances[to] + amount;\n\n        balances[to] = newBalance;\n\n        emit Deposited(to, amount, balances[to]);\n    }\n\n    function withdraw(uint256 amount) external {        \n        require(amount <= balances[msg.sender], \"Not enough\");\n\n        balances[msg.sender] = balances[msg.sender] - amount;\n\n        (bool ok, ) = msg.sender.call{value: amount}(\"\");\n        require(ok, \"Fail\");\n\n        emit Withdraw(msg.sender, amount);\n    }\n\n    function balanceOf(address account) view external returns(uint256) {\n        return balances[account];\n    }\n\n    event Deposited(address indexed user, uint256 amount, uint256 totalBalance);\n    event Withdraw(address indexed user, uint256 amount);\n}\n"
+      }
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_28-ee30f0f6d5445c9e5573b9ac96ef4f180888eaf4",
+  "solcVersion": "0.8.28",
+  "solcLongVersion": "0.8.28+commit.7893614a",
+  "userSourceNameMap": {
+    "contracts/DemoGasOptimized.sol": "project/contracts/DemoGasOptimized.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "cancun",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/DemoGasOptimized.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.28;\n\ncontract DemoGasOptimized {\n    string public name;\n    mapping(address => uint256) private balances;\n\n    constructor(string memory _name) {\n        name = _name;\n    }\n    /// @notice calldata дешевле memory для входящих данных\n    function deposit(address to, uint256 amount) external payable {\n        require(msg.value == amount, \"Value mismatch\");\n\n        // STORAGE: balances - хранится в storage\n        // Кешируем storage в stack-переменную (оптимизация)\n        uint256 prev = balances[to];\n        uint256 newBalance = prev + amount;\n\n        balances[to] = newBalance;\n\n        emit Deposited(to, amount, newBalance);\n    }\n    \n\n    /// @notice демо stack и storage оптимизации\n    function withdraw(uint256 amount) external {\n        uint256 balanceInMemory = balances[msg.sender]; // SLOAD only once\n        \n        require(amount <= balanceInMemory, \"Not enough\");\n\n        balances[msg.sender] = balanceInMemory - amount; // SSTORE once\n\n        (bool ok, ) = msg.sender.call{value: amount}(\"\");\n        require(ok, \"Fail\");\n\n        emit Withdraw(msg.sender, amount);\n    }\n\n    function balanceOf(address account) view external returns(uint256) {\n        return balances[account];\n    }\n\n    event Deposited(address indexed user, uint256 amount, uint256 totalBalance);\n    event Withdraw(address indexed user, uint256 amount);\n}\n"
+      }
+    }
+  }
+}

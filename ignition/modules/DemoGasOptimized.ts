@@ -1,7 +1,7 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
 export default buildModule("DemoGasOptimizedModule", (m) => {
-  const demo = m.contract("DemoGasOptimized");
+  const demo = m.contract("DemoGasOptimized", ["DemoGasOptimized"]);
 
   return { demo };
 });
