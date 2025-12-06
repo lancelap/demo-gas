@@ -1,57 +1,86 @@
-# Sample Hardhat 3 Beta Project (`node:test` and `viem`)
+# demo-gas
 
-This project showcases a Hardhat 3 Beta project using the native Node.js test runner (`node:test`) and the `viem` library for Ethereum interactions.
+Minimal Hardhat demo focused on measuring and comparing gas usage between two Solidity contracts:
 
-To learn more about the Hardhat 3 Beta, please visit the [Getting Started guide](https://hardhat.org/docs/getting-started#getting-started-with-hardhat-3). To share your feedback, join our [Hardhat 3 Beta](https://hardhat.org/hardhat3-beta-telegram-group) Telegram group or [open an issue](https://github.com/NomicFoundation/hardhat/issues/new) in our GitHub issue tracker.
+- `contracts/DemoGas.sol` — baseline implementation
+- `contracts/DemoGasOptimized.sol` — optimized implementation
 
-## Project Overview
+This repository contains simple contracts, tests, and build artifacts so you can reproduce gas measurements and see how small Solidity changes affect gas costs.
 
-This example project includes:
+## What you'll find here
 
-- A simple Hardhat configuration file.
-- Foundry-compatible Solidity unit tests.
-- TypeScript integration tests using [`node:test`](nodejs.org/api/test.html), the new Node.js native test runner, and [`viem`](https://viem.sh/).
-- Examples demonstrating how to connect to different types of networks, including locally simulating OP mainnet.
+- Solidity contracts: `contracts/`
+- Tests: `test/` (TypeScript tests using Hardhat)
+- Artifacts and build-info: `artifacts/`, `cache/`
+- Coverage output (if generated): `coverage/`
 
-## Usage
+## Prerequisites
 
-### Running Tests
+- Node.js (18+ recommended)
+- npm (or pnpm/yarn if you prefer; commands below use npm)
+- npx (ships with npm)
 
-To run all the tests in the project, execute the following command:
+This project uses Hardhat (dev dependency) for compilation and testing.
 
-```shell
+## Install
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+## Common commands
+
+- Compile contracts:
+
+```bash
+npx hardhat compile
+```
+
+- Run tests:
+
+```bash
 npx hardhat test
 ```
 
-You can also selectively run the Solidity or `node:test` tests:
+Tests are TypeScript (`test/*.ts`). If you prefer running tests through npm scripts you can add a `test` script to `package.json` like:
 
-```shell
-npx hardhat test solidity
-npx hardhat test nodejs
+```json
+"scripts": {
+	"test": "npx hardhat test"
+}
 ```
 
-### Make a deployment to Sepolia
+## Running a single test file
 
-This project includes an example Ignition module to deploy the contract. You can deploy this module to a locally simulated chain or to Sepolia.
-
-To run the deployment to a local chain:
-
-```shell
-npx hardhat ignition deploy ignition/modules/Counter.ts
+```bash
+npx hardhat test test/DemoGas.test.ts
 ```
 
-To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key of the account you want to use.
+## Notes about gas measurement
 
-You can set the `SEPOLIA_PRIVATE_KEY` variable using the `hardhat-keystore` plugin or by setting it as an environment variable.
+- This repository is organized to let you compare the baseline and optimized contract implementations. The tests verify behavior; you can add logging or measurement helpers in tests to print gas used by transactions.
+- Hardhat's `--verbose` output and transaction receipts returned by ethers/providers include gas used. Consider adding a small test helper that prints `receipt.gasUsed` for specific calls.
 
-To set the `SEPOLIA_PRIVATE_KEY` config variable using `hardhat-keystore`:
+## Project layout
 
-```shell
-npx hardhat keystore set SEPOLIA_PRIVATE_KEY
-```
+- `contracts/` — solidity sources
+- `test/` — tests (TypeScript)
+- `artifacts/` — compilation artifacts (auto-generated)
+- `cache/` — Hardhat compile cache
+- `hardhat.config.ts` — Hardhat configuration
 
-After setting the variable, you can run the deployment with the Sepolia network:
+## Troubleshooting
 
-```shell
-npx hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
-```
+- If tests fail due to missing dependencies, run `npm install` again.
+- If TypeScript test compilation errors occur, ensure your Node version and installed `typescript` match the repo expectations.
+
+## Contributing
+
+Contributions are welcome. Open issues or PRs for improvements, especially if you add a new optimization or gas measurement helper.
+
+## License
+
+MIT
+
